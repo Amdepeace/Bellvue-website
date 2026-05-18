@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(npm start *)"
+      "Bash(npm start *)",
+      "Bash(npm run *)",
+      "Bash(vercel --version)",
+      "PowerShell(vercel --version 2>&1)",
+      "PowerShell(vercel whoami 2>&1)"
     ]
   }
 }
