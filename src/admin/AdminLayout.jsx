@@ -10,7 +10,7 @@ const NAV = [
     to: "/admin/housekeeping",
     icon: "cleaning_services",
     label: "Rooms",
-    live: false,
+    live: true,
   },
   { to: "/admin/reports", icon: "analytics", label: "Reports", live: false },
   { to: "/admin/reviews", icon: "reviews", label: "Reviews", live: false },

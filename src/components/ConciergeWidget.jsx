@@ -8,7 +8,7 @@ const SUGGESTIONS = [
 ];
 
 const OFFLINE_REPLY =
-  "My apologies — our virtual concierge is being prepared. Please email concierge@bellevue.com or call +251 11 555 0100 and one of our team will respond personally within four hours.";
+  "My apologies — I'm momentarily offline. Please email concierge@bellevue.com or call +251 11 555 0100 and one of our team will respond personally within four hours.";
 
 export function ConciergeWidget() {
   const [open, setOpen] = useState(false);
@@ -27,17 +27,33 @@ export function ConciergeWidget() {
       scrollerRef.current.scrollTop = scrollerRef.current.scrollHeight;
   }, [msgs, busy]);
 
-  function send(text) {
+  async function send(text) {
     if (busy) return;
     const trimmed = (text || "").trim();
     if (!trimmed) return;
-    setMsgs((m) => [...m, { role: "user", text: trimmed }]);
+    const nextMsgs = [...msgs, { role: "user", text: trimmed }];
+    setMsgs(nextMsgs);
     setDraft("");
     setBusy(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/concierge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: nextMsgs }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const reply = (data?.reply || "").trim();
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", text: reply || OFFLINE_REPLY },
+      ]);
+    } catch (err) {
+      console.error("[concierge]", err);
       setMsgs((m) => [...m, { role: "assistant", text: OFFLINE_REPLY }]);
+    } finally {
       setBusy(false);
-    }, 700);
+    }
   }
 
   return (
